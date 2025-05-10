@@ -12,6 +12,7 @@
 
 
 class UMenuGameInstance;
+class ULobbySettingsWidget;
 #include <OnlineSessionSettings.h>
 #include "MainMenuWidget.generated.h"
 
@@ -34,18 +35,26 @@ public:
 	void PopulateSteamDetails();
 	void SetSteamAvatar();
 	UFUNCTION()
-	void CreateGameSession();
+	void CacheSession(FString SessionName, FString SessionPassword, int MaxPlayers, bool JoinInProgress, bool ShouldAdvertise);
 
 	void OnCreateSessionComplete(FNamedOnlineSession* SessionName, bool bWasSuccessful);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UMenuGameInstance* cachedGameInstance;
 
+	//Widgets 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	ULobbySettingsWidget* SessionSettings;
+
+	// Images and textures
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "steam UI")
 	UTexture2D* steamUserAvatar;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UImage> SteamAvatar;
+
+	//Buttons
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,meta = (BindWidget))
 	UCustomButton* BTN_CreateSession;
@@ -60,10 +69,11 @@ public:
 	UWidgetSwitcher* PanelSwitcher;
 
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> SteamNameText;
-
-	UPROPERTY(meta = (BindWidget))
 	UButton* CreateSession;
+
+	//Other 
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> SteamNameText;
 
 	UFUNCTION()
 	void OnMenuClicked(EMenuTypes MenuType);

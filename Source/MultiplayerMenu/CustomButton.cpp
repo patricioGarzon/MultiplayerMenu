@@ -11,8 +11,9 @@ void UCustomButton::NativeConstruct()
     // Check if MenuButton and BTN_Text are valid
     if (MenuButton)
     {
+         MenuButton->OnClicked.AddDynamic(this, &UCustomButton::HandleOneParamClick);
         // If valid, bind the button click event
-        MenuButton->OnClicked.AddDynamic(this, &UCustomButton::HandleClick);
+        
     }
 
     // Check if BTN_Text is valid and update the text if needed
@@ -22,7 +23,7 @@ void UCustomButton::NativeConstruct()
     }
 }
 
-void UCustomButton::HandleClick()
+void UCustomButton::HandleOneParamClick()
 {
-    OnCustomButtonClicked.Broadcast(BTN_Type);
+    OnCustomButtonClicked.Broadcast(BTN_MenuType);
 }

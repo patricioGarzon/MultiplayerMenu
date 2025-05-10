@@ -2,6 +2,7 @@
 #include "MainMenuWidget.h"
 #include <Kismet/KismetSystemLibrary.h>
 #include "MenuGameInstance.h"
+#include "LobbySettingsWidget.h"
 #include <OnlineSessionSettings.h>
 
 
@@ -18,10 +19,10 @@ void UMainMenuWidget::NativeConstruct()
 	if (BTN_Settings != nullptr) {
 		BTN_Settings->OnCustomButtonClicked.AddDynamic(this, &UMainMenuWidget::OnMenuClicked);
 	}	
-	if (CreateSession)
+	if (SessionSettings && SessionSettings->BTN_CreateSession)
 	{
 		// Bind the OnClicked event to your function
-		CreateSession->OnClicked.AddDynamic(this, &UMainMenuWidget::CreateGameSession);
+		SessionSettings->OnCreateSessionClicked.AddDynamic(this, &UMainMenuWidget::CacheSession);
 	}
 	PopulateSteamDetails();
 	SetSteamAvatar();
@@ -56,9 +57,10 @@ void UMainMenuWidget::SetSteamAvatar()
 	}	
 }
 
-void UMainMenuWidget::CreateGameSession()
+void UMainMenuWidget::CacheSession(FString SessionName, FString SessionPassword, int MaxPlayers, bool JoinInProgress, bool ShouldAdvertise)
 {
-	cachedGameInstance->CreateSession("Test", "", 4, true, true, true, true);
+	cachedGameInstance->CacheSession(SessionName,SessionPassword, MaxPlayers, JoinInProgress,ShouldAdvertise);
+	cachedGameInstance->CreateSession();
 }
 
 void UMainMenuWidget::OnCreateSessionComplete(FNamedOnlineSession* CreatedSession, bool bWasSuccessful)

@@ -6,7 +6,10 @@
 #include "Interfaces/OnlineSessionInterface.h"
 #include "Interfaces/OnlineIdentityInterface.h"
 #include "MultiplayerMenuGameMode.h"
+#include "GameFramework/Actor.h"
 #include <Private/OnlineSubsystemSteamTypes.h>
+#include "CustromPlayerController.h"
+#include <Kismet/GameplayStatics.h>
 
 
 
@@ -15,7 +18,9 @@ void UMenuGameInstance::Init()
     Super::Init();
 
     // Get OnlineSubsystem (e.g., Steam)
-    OnlineSubsystem = IOnlineSubsystem::Get();
+
+    FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UMenuGameInstance::OnMapLoaded);
+    OnlineSubsystem = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
     if (OnlineSubsystem)
     {
         UE_LOG(LogTemp, Log, TEXT("Online Subsystem: %s"), *OnlineSubsystem->GetSubsystemName().ToString());
@@ -36,7 +41,7 @@ void UMenuGameInstance::Init()
                     CachedSteamId = UserId->ToString();
                     // Now create the menu since Steam info is ready
                     FTimerHandle MenuDelayHandle;
-                    GetWorld()->GetTimerManager().SetTimer(MenuDelayHandle, this, &UMenuGameInstance::CreateMenu, 1.0f, false);
+                    GetWorld()->GetTimerManager().SetTimer(MenuDelayHandle, this, &UMenuGameInstance::CreateMainMenu, 1.0f, false);
                   
                 }       
             }
@@ -49,10 +54,22 @@ void UMenuGameInstance::Init()
     else
     {
         UE_LOG(LogTemp, Error, TEXT("No OnlineSubsystem found!"));
+        //Create the menu when the PC is ready 
+        FTimerHandle MenuDelayHandle;
+        GetWorld()->GetTimerManager().SetTimer(MenuDelayHandle, this, &UMenuGameInstance::CreateMainMenu, 1.0f, false);
     }
 }
 
-void UMenuGameInstance::CreateMenu()
+void UMenuGameInstance::OnMapLoaded(UWorld* LoadedWorld)
+{
+}
+
+void UMenuGameInstance::CheckForLobbyMap()
+{
+  
+}
+
+void UMenuGameInstance::CreateMainMenu()
 {
     if (MainMenuWidgetClass) {
         MenuUI = CreateWidget<UMainMenuWidget>(GetWorld(), MainMenuWidgetClass, "Menu HUD");
@@ -88,7 +105,7 @@ UTexture2D* UMenuGameInstance::GetSteamAvatar()
 
     if (Avatar <= 0) {
         UE_LOG(LogTemp, Warning, TEXT("Steam Avatar not available yet"));
-        GEngine->AddOnScreenDebugMessage(-1, 50.0f, FColor::Green, "avatar not initialized yedt");
+        //GEngine->AddOnScreenDebugMessage(-1, 50.0f, FColor::Green, "avatar not initialized yedt");
         return nullptr;
     }
 
@@ -105,7 +122,7 @@ UTexture2D* UMenuGameInstance::GetSteamAvatar()
     if (!bSuccess)
     {
         GEngine->AddOnScreenDebugMessage(-1, 50.0f, FColor::Green, "Avatar id recieved but no image");
-        UE_LOG(LogTemp, Error, TEXT("SteamUtils()->GetImageRGBA failed even though avatar ID is valid!"));
+        //UE_LOG(LogTemp, Error, TEXT("SteamUtils()->GetImageRGBA failed even though avatar ID is valid!"));
         return nullptr;
     }
     if (RawData.Num() > 0)
@@ -113,10 +130,7 @@ UTexture2D* UMenuGameInstance::GetSteamAvatar()
         uint8 FirstPixelR = RawData[0];
         uint8 FirstPixelG = RawData[1];
         uint8 FirstPixelB = RawData[2];
-        uint8 FirstPixelA = RawData[3];
-
-        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan,
-            FString::Printf(TEXT("First pixel RGBA: %d %d %d %d"), FirstPixelR, FirstPixelG, FirstPixelB, FirstPixelA));
+        uint8 FirstPixelA = RawData[3]; 
     }
 
     if (!SteamUtils()->GetImageRGBA(Avatar, RawData.GetData(), RawData.Num())) {
@@ -137,6 +151,15 @@ UTexture2D* UMenuGameInstance::GetSteamAvatar()
     AvatarTexture->UpdateResource();
 
     return AvatarTexture;
+}
+
+void UMenuGameInstance::CacheSession(FString SessionName, FString SessionPassword, int MaxPlayers, bool JoinInProgress, bool ShouldAdvertise)
+{
+    ChSessionDetails.SessionName = SessionName;
+    ChSessionDetails.SessionPassword = SessionPassword;
+    ChSessionDetails.MaxPlayers = MaxPlayers;
+    ChSessionDetails.JoinInProgress = true;
+    ChSessionDetails.ShouldAdvertise = true;
 }
 
 void UMenuGameInstance::OnSteamLoginCompleted(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& UserId, const FString& Error)
@@ -184,8 +207,9 @@ void UMenuGameInstance::PrintSteamInfo()
     UE_LOG(LogTemp, Log, TEXT("Steam ID: %s"), *CachedSteamId);
 }
 
-void UMenuGameInstance::CreateSession(FString SessionName, FString SessionPassword, int MaxPlayers, bool Lan, bool JoinInProgress, bool ShouldAdvertise, bool UsePresence)
+void UMenuGameInstance::CreateSession()
 {
+
     if (OnlineSubsystem)
     {
         IOnlineSessionPtr Sessions = OnlineSubsystem->GetSessionInterface();
@@ -198,15 +222,14 @@ void UMenuGameInstance::CreateSession(FString SessionName, FString SessionPasswo
             );
             //
             FOnlineSessionSettings SessionSettings;
-            SessionSettings.bIsLANMatch = Lan; // Set to true for LAN
-            SessionSettings.NumPublicConnections = MaxPlayers; // Set max players
-            SessionSettings.bAllowJoinInProgress = JoinInProgress;
-            SessionSettings.bShouldAdvertise = ShouldAdvertise;
+            SessionSettings.NumPublicConnections = ChSessionDetails.MaxPlayers; // Set max players
+            SessionSettings.bAllowJoinInProgress = ChSessionDetails.JoinInProgress;
+            SessionSettings.bShouldAdvertise = ChSessionDetails.ShouldAdvertise;
             SessionSettings.bUsesPresence = true;
             SessionSettings.bUseLobbiesIfAvailable = true;
 
-            if (!SessionPassword.IsEmpty()) {
-                SessionSettings.Set(FName(SessionPassword), FString(SessionPassword), EOnlineDataAdvertisementType::ViaOnlineService);
+            if (!ChSessionDetails.SessionPassword.IsEmpty()) {
+                SessionSettings.Set(FName(ChSessionDetails.SessionPassword), FString(ChSessionDetails.SessionPassword), EOnlineDataAdvertisementType::ViaOnlineService);
             }
             CSteamID SteamID = SteamUser()->GetSteamID();
             IOnlineIdentityPtr Identity = OnlineSubsystem->GetIdentityInterface();
@@ -216,7 +239,7 @@ void UMenuGameInstance::CreateSession(FString SessionName, FString SessionPasswo
                 if (UniqueId.IsValid())
                 {
                     // ✅ Now pass a reference to CreateSession
-                    bool bCreated = Sessions->CreateSession(*UniqueId, FName(*SessionName), SessionSettings);
+                    bool bCreated = Sessions->CreateSession(*UniqueId, FName(*ChSessionDetails.SessionName), SessionSettings);
                     if (!bCreated)
                     {
                         GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("CreateSession failed to start"));
@@ -229,7 +252,10 @@ void UMenuGameInstance::CreateSession(FString SessionName, FString SessionPasswo
             }
         }
     }
-    
+    else {
+    //Prepare to create local, offline game
+       // UGameplayStatics::OpenLevel(this, "LobbyMenuLevel");
+    }
 }
 
 void UMenuGameInstance::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)
@@ -240,16 +266,24 @@ void UMenuGameInstance::OnCreateSessionComplete(FName SessionName, bool bWasSucc
             IOnlineSessionPtr Sessions = OnlineSubsystem->GetSessionInterface();
             if (Sessions.IsValid())
             {
-                FNamedOnlineSession* CreatedSession = Sessions->GetNamedSession(SessionName);
-                MenuUI->OnCreateSessionComplete(CreatedSession, bWasSuccessful);
-                Sessions->ClearOnCreateSessionCompleteDelegate_Handle(OnCreateSessionCompleteDelegateHandle);
+                if (GetWorld() && GetWorld()->GetNetMode() != NM_Client)
+                {
+                    // Host = local controller on listen server
+                    APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+                    if (ACustromPlayerController* HostPC = Cast<ACustromPlayerController>(PC))
+                    {
+                        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::White, "Player calling server travel");
+                        HostPC->Server_TravelToLobby();
+                    }
+                    // Perform ServerTravel with seamless travel disabled
+                    //GetWorld()->ServerTravel("/Game/Menu/LobbyMenuLevel?listen", false); // false disables seamless travel
+                }
             }
         }
     }
     else {
-        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::White, "Session not created");
+        GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Red, "Session not created");
     }
-    
 }
 
 void UMenuGameInstance::CacheSteamUserInfo()

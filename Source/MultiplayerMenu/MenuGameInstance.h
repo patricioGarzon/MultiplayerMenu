@@ -21,7 +21,21 @@ class UMainMenuWidget;
 /**
  * 
  */
-
+USTRUCT(BlueprintType)
+struct FSessionDetails
+{
+	GENERATED_BODY()
+	UPROPERTY(BlueprintReadWrite)
+	FString SessionName;
+	UPROPERTY(BlueprintReadWrite)
+	FString SessionPassword;
+	UPROPERTY(BlueprintReadWrite)
+	int MaxPlayers;
+	UPROPERTY(BlueprintReadWrite)
+	bool JoinInProgress;
+	UPROPERTY(BlueprintReadWrite)
+	bool ShouldAdvertise;
+};
 
 UCLASS()
 class MULTIPLAYERMENU_API UMenuGameInstance : public UGameInstance
@@ -29,6 +43,9 @@ class MULTIPLAYERMENU_API UMenuGameInstance : public UGameInstance
 	GENERATED_BODY()
 public:
 	virtual void Init() override;
+	UFUNCTION()
+	void OnMapLoaded(UWorld* LoadedWorld);
+	void CheckForLobbyMap();
 
 	// Post-login callback handler
 	void OnSteamLoginCompleted(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& UserId, const FString& Error);
@@ -39,7 +56,7 @@ public:
 
 	// Functions to create and populate main menu data
 	UFUNCTION(BlueprintCallable)
-	void CreateMenu();
+	void CreateMainMenu();
 	UTexture2D* GetSteamAvatar();
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level UI")
 	TSubclassOf<UMainMenuWidget> MainMenuWidgetClass;
@@ -47,7 +64,10 @@ public:
 	UMainMenuWidget* MenuUI = nullptr;
 
 	// Connectivity hosting and finding game;
-	void CreateSession(FString SessionName,FString SessionPassword, int MaxPlayers,bool Lan, bool JoinInProgress, bool ShouldAdvertise,bool UsePresence);
+	UPROPERTY(BlueprintReadWrite)
+	FSessionDetails ChSessionDetails;
+	void CacheSession(FString SessionName, FString SessionPassword, int MaxPlayers, bool JoinInProgress, bool ShouldAdvertise);
+	void CreateSession();
 	void FindSessions();
 	void JoinSession();
 
