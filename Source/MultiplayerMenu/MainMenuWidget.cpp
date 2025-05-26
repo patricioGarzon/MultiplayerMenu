@@ -4,29 +4,44 @@
 #include "MenuGameInstance.h"
 #include "LobbySettingsWidget.h"
 #include <OnlineSessionSettings.h>
+#include "MultiplayerMenuGameMode.h"
+#include "NewsFeedManager.h"
+#include <Kismet/GameplayStatics.h>
 
 
 void UMainMenuWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	//make sure button is not  a null ptr
-	if (BTN_CreateSession != nullptr) {
-		BTN_CreateSession->OnCustomButtonClicked.AddDynamic(this, &UMainMenuWidget::OnMenuClicked);
-	}
-	if (BTN_JoinSession != nullptr) {
-		BTN_JoinSession->OnCustomButtonClicked.AddDynamic(this, &UMainMenuWidget::OnMenuClicked);
-	}
-	if (BTN_Settings != nullptr) {
-		BTN_Settings->OnCustomButtonClicked.AddDynamic(this, &UMainMenuWidget::OnMenuClicked);
-	}	
-	if (SessionSettings && SessionSettings->BTN_CreateSession)
-	{
-		// Bind the OnClicked event to your function
-		SessionSettings->OnCreateSessionClicked.AddDynamic(this, &UMainMenuWidget::CacheSession);
-	}
+
 	PopulateSteamDetails();
 	SetSteamAvatar();
+	BindUI();
+
+	if (UNewsFeedManager* FeedManager = GetNewsFeedManager()) {
+		FeedManager->OnNewsUpdated.AddDynamic(this, &UMainMenuWidget::PopulateNewsFeed);		
+	}
+
+	if (auto* GM = Cast< AMultiplayerMenuGameMode>(UGameplayStatics::GetGameMode(this))) {
+		GM->LoadNews();
+	}
+	if (cachedGameInstance) {
+		SavedGamesArray = cachedGameInstance->LoadSavedGames();
+		PopulateLoadGames();
+	}
+
 }
+
+UNewsFeedManager* UMainMenuWidget::GetNewsFeedManager()
+{
+	//access the news feed manager to retrieve the data;
+	if (auto* GM = Cast< AMultiplayerMenuGameMode>(UGameplayStatics::GetGameMode(this)) ){
+		return GM->curNewsGameManager;
+	}
+	return nullptr;
+}
+
+
+
 
 void UMainMenuWidget::PopulateSteamDetails()
 {
@@ -57,6 +72,13 @@ void UMainMenuWidget::SetSteamAvatar()
 	}	
 }
 
+void UMainMenuWidget::ShowMainMenu(EMenuTypes MenuType)
+{
+	PanelSwitcher->SetActiveWidgetIndex(0);
+	BTN_Back->SetVisibility(ESlateVisibility::Collapsed);
+	WBP_NewsFeed->SetVisibility(ESlateVisibility::Visible);
+}
+
 void UMainMenuWidget::CacheSession(FString SessionName, FString SessionPassword, int MaxPlayers, bool JoinInProgress, bool ShouldAdvertise)
 {
 	cachedGameInstance->CacheSession(SessionName,SessionPassword, MaxPlayers, JoinInProgress,ShouldAdvertise);
@@ -79,9 +101,13 @@ void UMainMenuWidget::OnCreateSessionComplete(FNamedOnlineSession* CreatedSessio
 
 void UMainMenuWidget::OnMenuClicked(EMenuTypes MenuType)
 {
+	if (MenuType != EMenuTypes::Quit) {
+		WBP_NewsFeed->SetVisibility(ESlateVisibility::Hidden);
+		BTN_Back->SetVisibility(ESlateVisibility::Visible);
+	}	
 	switch (MenuType) {
 	case EMenuTypes::Play:
-		PanelSwitcher->SetActiveWidgetIndex(0);		
+		PanelSwitcher->SetActiveWidgetIndex(1);		
 		break;
 	case EMenuTypes::CreateSession:
 		PanelSwitcher->SetActiveWidgetIndex(0);
@@ -97,3 +123,30 @@ void UMainMenuWidget::OnMenuClicked(EMenuTypes MenuType)
 
 	}
 }
+
+
+void UMainMenuWidget::BindUI()
+{
+	//make sure button is not  a null ptr
+	if (BTN_Play != nullptr) {
+		BTN_Play->OnCustomButtonClicked.AddDynamic(this, &UMainMenuWidget::OnMenuClicked);
+	}
+	if (BTN_JoinGame != nullptr) {
+		BTN_JoinGame->OnCustomButtonClicked.AddDynamic(this, &UMainMenuWidget::OnMenuClicked);
+	}
+	if (BTN_Settings != nullptr) {
+		BTN_Settings->OnCustomButtonClicked.AddDynamic(this, &UMainMenuWidget::OnMenuClicked);
+	}
+	if (BTN_Quit != nullptr) {
+		BTN_Quit->OnCustomButtonClicked.AddDynamic(this, &UMainMenuWidget::OnMenuClicked);
+	}
+	if (SessionSettings && SessionSettings->BTN_CreateSession)
+	{
+		// Bind the OnClicked event to your function
+		SessionSettings->OnCreateSessionClicked.AddDynamic(this, &UMainMenuWidget::CacheSession);
+	}
+	if (BTN_Back != nullptr) {
+		BTN_Back->OnCustomButtonClicked.AddDynamic(this, &UMainMenuWidget::ShowMainMenu);
+	}
+}
+

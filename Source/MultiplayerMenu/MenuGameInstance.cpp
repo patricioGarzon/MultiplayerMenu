@@ -9,7 +9,10 @@
 #include "GameFramework/Actor.h"
 #include <Private/OnlineSubsystemSteamTypes.h>
 #include "CustromPlayerController.h"
+#include "MediaPlayer.h"
+#include "FileMediaSource.h"
 #include <Kismet/GameplayStatics.h>
+#include "MySavedGame.h"
 
 
 
@@ -75,7 +78,11 @@ void UMenuGameInstance::CreateMainMenu()
         MenuUI = CreateWidget<UMainMenuWidget>(GetWorld(), MainMenuWidgetClass, "Menu HUD");
         if (MenuUI) {
             MenuUI->AddToViewport(100);
-
+            if (MenuUI->MediaPlayer && MenuUI->MediaSource) {
+                if (MenuUI->MediaPlayer->OpenSource(MenuUI->MediaSource)) {
+                    MenuUI->MediaPlayer->Play();
+                }
+            }
             APlayerController* PC = GetWorld()->GetFirstPlayerController();
             if (PC)
             {
@@ -254,8 +261,54 @@ void UMenuGameInstance::CreateSession()
     }
     else {
     //Prepare to create local, offline game
-       // UGameplayStatics::OpenLevel(this, "LobbyMenuLevel");
+       UGameplayStatics::OpenLevel(this, "LobbyMenuLevel");
     }
+}
+
+void UMenuGameInstance::CreateGame()
+{
+    //Initial game created
+
+    UMySavedGame* SavedGameInstance = Cast<UMySavedGame>(UGameplayStatics::CreateSaveGameObject(UMySavedGame::StaticClass()));
+    
+    SavedGameInstance->MapName = "Initial Town";
+    SavedGameInstance->Progression = 0;
+    SavedGameInstance->TimePlayed = 0;
+    
+    UGameplayStatics::SaveGameToSlot(SavedGameInstance, SavedGameInstance->MapName, 0);
+}
+
+TArray<FString> UMenuGameInstance::LoadSavedGames()
+{
+    TArray<FString> SaveSlotNames;
+
+    //Get the directory for the fiels
+    FString SaveDir = FPaths::ProjectSavedDir() + "SaveGames/";
+
+    IFileManager& FileManager = IFileManager::Get();
+
+    // Get all .sav files
+    TArray<FString> FoundFiles;
+    FileManager.FindFiles(FoundFiles, *SaveDir, TEXT("*.sav"));
+
+    // Remove file extension and store just slot names
+    for (const FString& File : FoundFiles)
+    {
+        FString SlotName = FPaths::GetBaseFilename(File);
+        SaveSlotNames.Add(SlotName);
+    }
+    return SaveSlotNames;
+}
+
+void UMenuGameInstance::SaveGame(FString FileName)
+{
+    UMySavedGame* SavedGameInstance = Cast<UMySavedGame>(UGameplayStatics::CreateSaveGameObject(UMySavedGame::StaticClass()));
+    //All variables to be changed in game
+    SavedGameInstance->MapName = "Temp Name";
+    SavedGameInstance->Progression = 0;
+    SavedGameInstance->TimePlayed = 0;// Get local variable for time;
+
+    UGameplayStatics::SaveGameToSlot(SavedGameInstance, FileName, 0);
 }
 
 void UMenuGameInstance::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)

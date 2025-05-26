@@ -13,6 +13,10 @@
 
 class UMenuGameInstance;
 class ULobbySettingsWidget;
+class UMediaPlayer;
+class UFileMediaSource;
+class UNewsFeedManager;
+struct FNewsItem;
 #include <OnlineSessionSettings.h>
 #include "MainMenuWidget.generated.h"
 
@@ -32,8 +36,14 @@ private:
 public:
 	
 	virtual void NativeConstruct() override;
+	UNewsFeedManager* GetNewsFeedManager();
+	UFUNCTION(BlueprintImplementableEvent)
+	void PopulateNewsFeed(const TArray<FNewsItem>& newsFeed);
+	void BindUI();
 	void PopulateSteamDetails();
 	void SetSteamAvatar();
+	UFUNCTION()
+	void ShowMainMenu(EMenuTypes MenuType);
 	UFUNCTION()
 	void CacheSession(FString SessionName, FString SessionPassword, int MaxPlayers, bool JoinInProgress, bool ShouldAdvertise);
 
@@ -46,7 +56,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	ULobbySettingsWidget* SessionSettings;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UUserWidget* WBP_NewsFeed;
+
 	// Images and textures
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Media")
+	UMediaPlayer* MediaPlayer;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Media")
+	UFileMediaSource* MediaSource;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "steam UI")
 	UTexture2D* steamUserAvatar;
@@ -57,26 +75,35 @@ public:
 	//Buttons
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,meta = (BindWidget))
-	UCustomButton* BTN_CreateSession;
+	UCustomButton* BTN_Play;
 
 	UPROPERTY( meta = (BindWidget))
-	UCustomButton* BTN_JoinSession;
+	UCustomButton* BTN_JoinGame;
 
 	UPROPERTY( meta = (BindWidget))
 	UCustomButton* BTN_Settings;
 
 	UPROPERTY(meta = (BindWidget))
-	UWidgetSwitcher* PanelSwitcher;
+	UCustomButton* BTN_Quit;
 
 	UPROPERTY(meta = (BindWidget))
-	UButton* CreateSession;
+	UCustomButton* BTN_Back;
+
+	//Extras
+
+	UPROPERTY(meta = (BindWidget))
+	UWidgetSwitcher* PanelSwitcher;
 
 	//Other 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> SteamNameText;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	TArray<FString> SavedGamesArray;
+
 	UFUNCTION()
 	void OnMenuClicked(EMenuTypes MenuType);
 
-	
+	UFUNCTION(BlueprintImplementableEvent)
+	void PopulateLoadGames();
 };

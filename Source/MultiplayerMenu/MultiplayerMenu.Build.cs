@@ -22,7 +22,11 @@ public class MultiplayerMenu : ModuleRules
             "OnlineSubsystemSteam", 
             "UMG",
             "Slate",           // ? Needed for UMG widgets
-            "SlateCore"  });
+            "SlateCore",
+            "MediaAssets",
+            "Json",
+            "JsonUtilities"
+        });
 
         // If using Steam, add OnlineSubsystemSteam
         PublicDependencyModuleNames.Add("OnlineSubsystemSteam");

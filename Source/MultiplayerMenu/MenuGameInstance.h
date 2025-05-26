@@ -11,8 +11,6 @@
 #include "Interfaces/OnlineSessionInterface.h"
 #include "Interfaces/OnlineIdentityInterface.h"
 #include "steam_api.h"
-
-
 class UMainMenuWidget;
 
 // The generated header should always be the last include
@@ -54,6 +52,7 @@ public:
 	FString GetSteamNickname() const { return CachedNickname; }
 	FString GetSteamIdString() const { return CachedSteamId; }
 
+
 	// Functions to create and populate main menu data
 	UFUNCTION(BlueprintCallable)
 	void CreateMainMenu();
@@ -70,6 +69,17 @@ public:
 	void CreateSession();
 	void FindSessions();
 	void JoinSession();
+
+
+	// Loading and saving games
+	UFUNCTION(BlueprintCallable)
+	void CreateGame();
+
+	UFUNCTION(BlueprintCallable)
+	TArray<FString> LoadSavedGames();
+
+	UFUNCTION(BlueprintCallable)
+	void SaveGame(FString FileName);
 
 			// Sessions Call backs 
 	// Delegate to handle session creation completion
@@ -88,4 +98,6 @@ private:
 	
 	FString CachedNickname;
 	FString CachedSteamId;
+
+	float PlaySessionStartTime;
 };

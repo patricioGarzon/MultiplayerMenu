@@ -2,6 +2,7 @@
 
 #include "MultiplayerMenuGameMode.h"
 #include "MultiplayerMenuCharacter.h"
+#include "NewsFeedManager.h"
 #include "UObject/ConstructorHelpers.h"
 
 AMultiplayerMenuGameMode::AMultiplayerMenuGameMode()
@@ -17,4 +18,12 @@ void AMultiplayerMenuGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
+	curNewsGameManager = NewObject<UNewsFeedManager>(this);
+	curNewsGameManager->RegisterComponent();
+	
+}
+
+void AMultiplayerMenuGameMode::LoadNews()
+{
+	curNewsGameManager->LoadFromDataAsset(NewsDataAsset);
 }
