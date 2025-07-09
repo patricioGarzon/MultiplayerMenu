@@ -15,13 +15,15 @@ class MULTIPLAYERMENU_API UMySavedGame : public USaveGame
 	GENERATED_BODY()
 public:
     UPROPERTY(BlueprintReadWrite)
+    FString FileName;
+    UPROPERTY(BlueprintReadWrite)
     FString MapName;
 
     UPROPERTY(BlueprintReadWrite)
     int32 Progression;
 
     UPROPERTY(BlueprintReadWrite)
-    int32 Slot;
+    int32 SavedSlot;
 
     UPROPERTY(BlueprintReadWrite)
     float  TimePlayed;

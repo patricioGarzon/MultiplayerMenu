@@ -28,11 +28,11 @@ struct FSessionDetails
 	UPROPERTY(BlueprintReadWrite)
 	FString SessionPassword;
 	UPROPERTY(BlueprintReadWrite)
-	int MaxPlayers;
+	int MaxPlayers =0;
 	UPROPERTY(BlueprintReadWrite)
-	bool JoinInProgress;
+	bool JoinInProgress = false;
 	UPROPERTY(BlueprintReadWrite)
-	bool ShouldAdvertise;
+	bool ShouldAdvertise = false;
 };
 
 UCLASS()

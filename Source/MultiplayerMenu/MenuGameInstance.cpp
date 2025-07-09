@@ -307,7 +307,7 @@ void UMenuGameInstance::SaveGame(FString FileName)
     SavedGameInstance->MapName = "Temp Name";
     SavedGameInstance->Progression = 0;
     SavedGameInstance->TimePlayed = 0;// Get local variable for time;
-
+    CreateSession();
     UGameplayStatics::SaveGameToSlot(SavedGameInstance, FileName, 0);
 }
 

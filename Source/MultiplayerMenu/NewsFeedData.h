@@ -24,7 +24,7 @@ struct FNewsItem
     FText Description;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    UTexture2D* LocalImage;
+    UTexture2D* LocalImage = nullptr;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FString ImageURL; // for remote loading

@@ -47,7 +47,7 @@ struct FLevelData : public FTableRowBase
 	TSoftObjectPtr<UTexture2D> LevelImagePath;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EDifficulties Difficulties;
+	EDifficulties Difficulties = EDifficulties::Easy;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<EDifficulties> CurDifficulty;
