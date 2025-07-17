@@ -8,6 +8,7 @@
 
 enum class ESettingsCategory : uint8;
 class UHorizontalBox;
+class UEditableText;
 struct FSettingsDataTable;
 /**
  * 
@@ -23,13 +24,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UHorizontalBox* OptionsPanel;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UEditableText* OptionDescriptionText = nullptr;;
 	// Functions for retrieving infomration
 	UFUNCTION()
-	void UpdateSettingsVisuals(TArray<FSettingsDataTable> FilterSettings);
+	void UpdateSettingsVisuals(const TArray<FSettingsDataTable>& FilterSettings);
 
 	UFUNCTION()
 	void CacheData();
 
+	void PopulateDescription(FString Data);
 	UFUNCTION()
 	void FilterSettings(ESettingsCategory Category);
 

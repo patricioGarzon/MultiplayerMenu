@@ -10,8 +10,11 @@ class UTextBlock;
 class UButton;
 enum class ESettingsCategory : uint8;
 
-UDELEGATE(BlueprintCallable)
+UDELEGATE()
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSettingsBTNClicked, ESettingsCategory, BTN_Type);
+
+UDELEGATE(	)
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSettingHovered, FString, Description);
 /**
  * 
  */
@@ -34,11 +37,19 @@ public:
 
 	UPROPERTY(BlueprintCallable)
 	FOnSettingsBTNClicked OnBtnClicked;
+
+	UPROPERTY(BlueprintCallable)
+	FOnSettingHovered OnBtnHovered;
 protected:
 	UFUNCTION()
 	void HandleOneParamClick();
 
 	virtual void NativeConstruct() override;
+
+	UFUNCTION()
+	void OnHovered();
+	UFUNCTION()
+	void OnUnHovered();
 private:
 	FString SettingName;
 	FString SettingDescription;
