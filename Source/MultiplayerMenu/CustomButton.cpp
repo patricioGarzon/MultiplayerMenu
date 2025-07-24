@@ -17,7 +17,7 @@ void UCustomButton::NativeConstruct()
     }
 
     // Check if BTN_Text is valid and update the text if needed
-    if (BTN_Text)
+    if (BTN_Text && !FBName.IsEmpty())
     {
         BTN_Text->SetText(FText::FromString(FBName));
     }
@@ -26,4 +26,9 @@ void UCustomButton::NativeConstruct()
 void UCustomButton::HandleOneParamClick()
 {
     OnCustomButtonClicked.Broadcast(BTN_MenuType);
+}
+
+void UCustomButton::HandleSettingsParamClick()
+{
+    OnSettingButtonClicked.Broadcast(SettingCategory);
 }

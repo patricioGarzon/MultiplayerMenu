@@ -117,8 +117,12 @@ void UMainMenuWidget::OnMenuClicked(EMenuTypes MenuType)
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::White, "Find session BTN");
 		PanelSwitcher->SetActiveWidgetIndex(1);
 		break;
+
+	case EMenuTypes::Settings:
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::White, "OpenSettings");
+		PanelSwitcher->SetActiveWidgetIndex(4);
 	case EMenuTypes::Quit:
-		UKismetSystemLibrary::QuitGame(GetWorld(), GetWorld()->GetFirstPlayerController(), EQuitPreference::Quit, false);
+		//UKismetSystemLibrary::QuitGame(GetWorld(), GetWorld()->GetFirstPlayerController(), EQuitPreference::Quit, false);
 		break;
 
 	}

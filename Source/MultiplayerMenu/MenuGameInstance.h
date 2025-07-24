@@ -35,6 +35,8 @@ struct FSessionDetails
 	bool ShouldAdvertise = false;
 };
 
+struct FSettingEntry;
+
 UCLASS()
 class MULTIPLAYERMENU_API UMenuGameInstance : public UGameInstance
 {
@@ -52,6 +54,8 @@ public:
 	FString GetSteamNickname() const { return CachedNickname; }
 	FString GetSteamIdString() const { return CachedSteamId; }
 
+	UPROPERTY()
+	TArray<FSettingEntry> GameSavedSettings;
 
 	// Functions to create and populate main menu data
 	UFUNCTION(BlueprintCallable)

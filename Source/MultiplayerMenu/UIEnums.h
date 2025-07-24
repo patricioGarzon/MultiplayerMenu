@@ -8,13 +8,16 @@
 /**
  * 
  */
+
+
 UENUM(BlueprintType)
 enum class EMenuTypes : uint8
 {
 	None		  UMETA(DisplayName = "No Menu"),
 	Play		  UMETA(DisplayName = "Play"),
 	CreateSession UMETA(DisplayName = "CreateSession"),
-	JoinSession   UMETA(DisplayName = "JoinSession"),
+	JoinSession   UMETA(DisplayName = "Join Session"),
+	Settings	  UMETA(DisplayName = "Settings"),
 	Quit   UMETA(DisplayName = "Quit")
 };
 

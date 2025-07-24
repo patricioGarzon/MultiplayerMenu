@@ -2,30 +2,42 @@
 
 
 #include "SettingsBaseButton.h"
+#include "SettingsEnums.h"
 #include <Components/Button.h>
+#include <Kismet/GameplayStatics.h>
 
 void USettingsBaseButton::NativeConstruct()
 {
 	Super::NativeConstruct();
 
 	if (SettingButton) {
-		SettingButton->OnClicked.AddDynamic(this, &USettingsBaseButton::HandleOneParamClick);
+
 		SettingButton->OnHovered.AddDynamic(this, &USettingsBaseButton::OnHovered);
 		SettingButton->OnUnhovered.AddDynamic(this, &USettingsBaseButton::OnUnHovered);
 
 	}
 }
-void USettingsBaseButton::SetUpButton(FString Name, FString description, bool Active, ESettingsCategory btnClass)
+void USettingsBaseButton::SetUpButton(FString Name, FString description, bool Active, ESettingButtonType btnClass,const TArray<FString> Commands,int profileValue)
 {
 	SettingName = Name;
 	SettingDescription = description;
 	SettingActive = Active;
 	BTNCategory = btnClass;
+	SettingCommands = Commands;
+	SettingValue = profileValue;
 }
 
-void USettingsBaseButton::HandleOneParamClick()
+void USettingsBaseButton::ExecuteCommad()
 {
-	OnBtnClicked.Broadcast(BTNCategory);
+	APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+	if (PC)
+	{	
+		for (FString cmnd : SettingCommands) {
+			if (!cmnd.IsEmpty()) {
+				PC->ConsoleCommand(cmnd, true);
+			}
+		}
+	}
 }
 
 void USettingsBaseButton::OnHovered()

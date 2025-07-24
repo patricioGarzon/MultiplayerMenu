@@ -12,6 +12,11 @@
 UDELEGATE(BlueprintCallable)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCustonBTNClicked, EMenuTypes, BTN_Type);
 
+UDELEGATE(BlueprintCallable)
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSettingBTNClicked, ESettingsCategory, BTN_SettingCategory);
+
+
+
 UCLASS()
 class MULTIPLAYERMENU_API UCustomButton : public UUserWidget
 {
@@ -27,14 +32,18 @@ public:
 	UPROPERTY(BlueprintCallable)
 	FOnCustonBTNClicked OnCustomButtonClicked;
 
-	
+	UPROPERTY(BlueprintCallable)
+	FOnSettingBTNClicked OnSettingButtonClicked;
 
+
+	UPROPERTY()
+	ESettingsCategory SettingCategory;
 	//UI BInding
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	TObjectPtr<UButton> MenuButton;
 
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY( meta = (BindWidget))
 	TObjectPtr<UTextBlock> BTN_Text;
 
 
@@ -46,5 +55,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void HandleOneParamClick();
+
+	UFUNCTION(BlueprintCallable)
+	void HandleSettingsParamClick();
 
 };

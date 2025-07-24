@@ -4,12 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include <Components/Button.h>
 #include "MainSettingsWidget.generated.h"
 
+
 enum class ESettingsCategory : uint8;
+enum class ESettingButtonType : uint8;
 class UHorizontalBox;
-class UEditableText;
+class UTextBlock;
+struct FSettingEntry;
 struct FSettingsDataTable;
+struct FSettingMeta;
 /**
  * 
  */
@@ -19,16 +24,22 @@ class MULTIPLAYERMENU_API UMainSettingsWidget : public UUserWidget
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UUserWidget* MainOptionsPanel = nullptr;
+	UButton* BTNSetSettings = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UHorizontalBox* MainOptionsPanel = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UHorizontalBox* OptionsPanel;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UEditableText* OptionDescriptionText = nullptr;;
+	UTextBlock* OptionDescriptionText = nullptr;;
 	// Functions for retrieving infomration
 	UFUNCTION()
-	void UpdateSettingsVisuals(const TArray<FSettingsDataTable>& FilterSettings);
+	void LoadCategoryButtons();
+	
+	UFUNCTION()
+	void UpdateSettingsVisuals(const TArray<FSettingMeta>& FilterSettings);
 
 	UFUNCTION()
 	void CacheData();
@@ -37,11 +48,25 @@ public:
 	UFUNCTION()
 	void FilterSettings(ESettingsCategory Category);
 
+	UFUNCTION()
+	void SetSettings();
+
+	UFUNCTION()
+	bool LoadOptionSettings();
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UUserWidget> BtnClass;
+	TSubclassOf<UUserWidget> BtnSettingClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<UUserWidget> BtnCategoryClass;
+
 private:
-	UDataTable* DT_GameSettings = nullptr;
-	TArray<FSettingsDataTable*> CachedSettings;
+
+	TMap<ESettingsCategory, TArray<FSettingMeta>> CategorizedSettingsMap;
+	TArray<FSettingEntry> GameSavedSettings;
+	bool bFileExist = false;
 protected:
 	virtual void NativeConstruct() override;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UDataTable* DT_GameSettings = nullptr;
 };

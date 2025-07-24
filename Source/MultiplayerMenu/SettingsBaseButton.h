@@ -8,10 +8,7 @@
 
 class UTextBlock;
 class UButton;
-enum class ESettingsCategory : uint8;
-
-UDELEGATE()
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSettingsBTNClicked, ESettingsCategory, BTN_Type);
+enum class ESettingButtonType : uint8;
 
 UDELEGATE(	)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSettingHovered, FString, Description);
@@ -33,16 +30,18 @@ public:
 	UButton* SettingButton = nullptr;
 
 	UFUNCTION()
-	void SetUpButton(FString Name, FString description, bool Active, ESettingsCategory btnClass);
-
-	UPROPERTY(BlueprintCallable)
-	FOnSettingsBTNClicked OnBtnClicked;
+	void SetUpButton(FString Name, FString description, bool Active, ESettingButtonType btnClass,const TArray<FString> Commands,int profileValue);
 
 	UPROPERTY(BlueprintCallable)
 	FOnSettingHovered OnBtnHovered;
+
+
+	//Getters
+	FString GetSettingName() { return SettingName; };
+	TArray<FString> GetCommands() { return SettingCommands; };
 protected:
 	UFUNCTION()
-	void HandleOneParamClick();
+	void ExecuteCommad();
 
 	virtual void NativeConstruct() override;
 
@@ -53,6 +52,8 @@ protected:
 private:
 	FString SettingName;
 	FString SettingDescription;
+	TArray<FString> SettingCommands;
 	bool SettingActive = false;
-	ESettingsCategory BTNCategory;
+	ESettingButtonType BTNCategory;
+	int SettingValue= 0;
 };

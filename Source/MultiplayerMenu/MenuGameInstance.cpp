@@ -13,14 +13,21 @@
 #include "FileMediaSource.h"
 #include <Kismet/GameplayStatics.h>
 #include "MySavedGame.h"
+#include "SettingsSubsystem.h"
 
 
 
 void UMenuGameInstance::Init()
 {
     Super::Init();
-
+    
     // Get OnlineSubsystem (e.g., Steam)
+    USettingsSubsystem* SettingsSubsystem = GetSubsystem<USettingsSubsystem>();
+    if (SettingsSubsystem)
+    {
+       GameSavedSettings = SettingsSubsystem->LoadGameSettings();
+    }
+    
 
     FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UMenuGameInstance::OnMapLoaded);
     OnlineSubsystem = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
