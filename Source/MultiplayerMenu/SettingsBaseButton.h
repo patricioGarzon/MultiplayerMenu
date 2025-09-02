@@ -23,8 +23,6 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* SettingsName = nullptr;
 
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* SettingsDescription = nullptr;
 
 	UPROPERTY(meta = (BindWidget))
 	UButton* SettingButton = nullptr;

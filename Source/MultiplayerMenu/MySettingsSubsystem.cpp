@@ -15,7 +15,7 @@ void UMySettingsSubsystem::SaveGameSettings()
 		SaveGameInstance->SavedSettings = CurrentSettings;
 
 		UGameplayStatics::SaveGameToSlot(SaveGameInstance, TEXT("UserSettings"), 0);
-	}
+	}//if not exist create a new save file
 }
 
 TArray<FSettingEntry> UMySettingsSubsystem::LoadGameSettings()

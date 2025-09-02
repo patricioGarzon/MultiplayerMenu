@@ -5,6 +5,7 @@
 #include "SettingsBaseButton.h"
 #include "Components/HorizontalBox.h"
 #include "Components/TextBlock.h"
+#include "Components/ScrollBox.h"
 #include "Blueprint/UserWidget.h"
 #include "SettingsDataTable.h"
 #include "SettingsSubsystem.h"
@@ -29,23 +30,26 @@ void UMainSettingsWidget::NativeConstruct()
 void UMainSettingsWidget::LoadCategoryButtons()
 {
 	UEnum* EnumPtr = StaticEnum<ESettingsCategory>();
-if (!EnumPtr) return;
+	if (!EnumPtr) return;
 
-int32 EnumCount = EnumPtr->NumEnums() - 1; // Avoid _MAX
-for (int32 n = 0; n < EnumCount; ++n)
-{
-    if (EnumPtr->HasMetaData(TEXT("Hidden"), n)) continue;
+	int32 EnumCount = EnumPtr->NumEnums() - 1; // Skip _MAX
+	for (int32 n = 0; n < EnumCount; ++n)
+	{
+		if (EnumPtr->HasMetaData(TEXT("Hidden"), n))
+			continue;
+		if (BtnCategoryClass) {
+			UCustomButton* TempBtn = CreateWidget<UCustomButton>(GetWorld(), BtnCategoryClass);
+			if (TempBtn && OptionsPanel)
+			{
+				FString Name = EnumPtr->GetDisplayNameTextByIndex(n).ToString();
+				TempBtn->FBName = Name;
 
-	UCustomButton* TempBtn = CreateWidget<UCustomButton>(GetWorld(), BtnSettingClass);
-    if (TempBtn)
-    {       
-		TempBtn->FBName = EnumPtr->GetDisplayNameTextByIndex(n).ToString();
-        //btn->EnumValue = static_cast<ESettingsCategory>(EnumPtr->GetValueByIndex(n));
-		TempBtn->OnSettingButtonClicked.AddDynamic(this, &UMainSettingsWidget::FilterSettings);
-        OptionsPanel->AddChild(TempBtn);
-        
-    }
-}
+				TempBtn->OnSettingButtonClicked.AddDynamic(this, &UMainSettingsWidget::FilterSettings);
+				OptionsPanel->AddChild(TempBtn);
+			}
+
+		}
+	}
 }
 
 void UMainSettingsWidget::UpdateSettingsVisuals(const TArray<FSettingMeta>& FilterSettings)
@@ -58,28 +62,26 @@ void UMainSettingsWidget::UpdateSettingsVisuals(const TArray<FSettingMeta>& Filt
 			return Entry.Name == FilterSettings[n].OptionName.ToString();
 		});
 
-		UUserWidget* BtnSetting = CreateWidget(GetWorld(), BtnSettingClass.Get());
-		if (BtnSetting) {
-			USettingsBaseButton* tempBtn = Cast<USettingsBaseButton>(BtnSetting);
-			if (tempBtn) {
-				tempBtn->OnBtnHovered.AddDynamic(this, &UMainSettingsWidget::PopulateDescription);
-				if (bFileExist) {
-					tempBtn->SetUpButton(FilterSettings[n].OptionName.ToString(),
-						FilterSettings[n].Description,
-						SavedEntry->bSavedBoolValue,
-						FilterSettings[n].SettingType,
-						FilterSettings[n].Commands,
-						SavedEntry->Value);
-				}
-				else {
-					tempBtn->SetUpButton(FilterSettings[n].OptionName.ToString(),
-						FilterSettings[n].Description,
-						FilterSettings[n].bIsActive,
-						FilterSettings[n].SettingType,
-						FilterSettings[n].Commands,
-						FilterSettings[n].DefaultValue);
-				}
-				
+		USettingsBaseButton* tempBtn = CreateWidget<USettingsBaseButton>(GetWorld(), BtnSettingClass.Get());
+		if (tempBtn) {
+			tempBtn->OnBtnHovered.AddDynamic(this, &UMainSettingsWidget::PopulateDescription);
+			if (bFileExist) {
+				tempBtn->SetUpButton(FilterSettings[n].OptionName.ToString(),
+					FilterSettings[n].Description,
+					SavedEntry->bSavedBoolValue,
+					FilterSettings[n].SettingType,
+					FilterSettings[n].Commands,
+					SavedEntry->Value);
+			}
+			else {
+				tempBtn->SetUpButton(FilterSettings[n].OptionName.ToString(),
+					FilterSettings[n].Description,
+					FilterSettings[n].bIsActive,
+					FilterSettings[n].SettingType,
+					FilterSettings[n].Commands,
+					FilterSettings[n].DefaultValue);
+
+
 				//here we should get form the file and modify only the fields user modified
 				//GameSavedSettings is TArray<FSettingEntry> 
 			}

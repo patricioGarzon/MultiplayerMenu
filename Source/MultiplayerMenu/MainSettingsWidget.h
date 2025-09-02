@@ -11,7 +11,9 @@
 enum class ESettingsCategory : uint8;
 enum class ESettingButtonType : uint8;
 class UHorizontalBox;
+class UScrollBox;
 class UTextBlock;
+class USettingsBaseButton;
 struct FSettingEntry;
 struct FSettingsDataTable;
 struct FSettingMeta;
@@ -27,10 +29,10 @@ public:
 	UButton* BTNSetSettings = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UHorizontalBox* MainOptionsPanel = nullptr;
+	UScrollBox* MainOptionsPanel = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	UHorizontalBox* OptionsPanel;
+	UScrollBox* OptionsPanel;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UTextBlock* OptionDescriptionText = nullptr;;
@@ -44,6 +46,7 @@ public:
 	UFUNCTION()
 	void CacheData();
 
+	UFUNCTION(qwq)
 	void PopulateDescription(FString Data);
 	UFUNCTION()
 	void FilterSettings(ESettingsCategory Category);
@@ -55,7 +58,7 @@ public:
 	bool LoadOptionSettings();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UUserWidget> BtnSettingClass;
+	TSubclassOf<USettingsBaseButton> BtnSettingClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<UUserWidget> BtnCategoryClass;

@@ -70,7 +70,7 @@ void UMenuGameInstance::Init()
     }
 }
 
-void UMenuGameInstance::OnMapLoaded(UWorld* LoadedWorld)
+void UMenuGameInstance:: (UWorld* LoadedWorld)
 {
 }
 
@@ -100,8 +100,7 @@ void UMenuGameInstance::CreateMainMenu()
                 }
                 PC->SetInputMode(FInputModeUIOnly());
                 PC->bShowMouseCursor = true;
-            }
-        }
+            }        }
     }
 }
 
