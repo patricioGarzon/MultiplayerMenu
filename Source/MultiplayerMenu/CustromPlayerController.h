@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -27,12 +27,20 @@ public:
     // The class of the lobby widget to show (set from Blueprints or C++)
     UPROPERTY(EditDefaultsOnly, Category = "UI")
     TSoftClassPtr <UGameLobbyMenu> LobbyWidgetClass;
+
+    UFUNCTION(BlueprintCallable)
+    void SwichNews(int index);
 protected:
     virtual void BeginPlay() override;
 
     // Handle showing the UI on client
     UFUNCTION(BlueprintCallable)
     void ShowUI();
+
+    UFUNCTION(BlueprintImplementableEvent)
+    void BindInputMapping();
+
+
 
 private:
 

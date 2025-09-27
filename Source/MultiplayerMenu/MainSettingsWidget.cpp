@@ -61,29 +61,30 @@ void UMainSettingsWidget::UpdateSettingsVisuals(const TArray<FSettingMeta>& Filt
 		FSettingEntry* SavedEntry = GameSavedSettings.FindByPredicate([&](const FSettingEntry& Entry) {
 			return Entry.Name == FilterSettings[n].OptionName.ToString();
 		});
+		if (BtnSettingClass) {
+			USettingsBaseButton* tempBtn = CreateWidget<USettingsBaseButton>(GetWorld(), BtnSettingClass.Get());
+			if (tempBtn) {
+				tempBtn->OnBtnHovered.AddDynamic(this, &UMainSettingsWidget::PopulateDescription);
+				if (bFileExist) {
+					tempBtn->SetUpButton(FilterSettings[n].OptionName.ToString(),
+						FilterSettings[n].Description,
+						SavedEntry->bSavedBoolValue,
+						FilterSettings[n].SettingType,
+						FilterSettings[n].Commands,
+						SavedEntry->Value);
+				}
+				else {
+					tempBtn->SetUpButton(FilterSettings[n].OptionName.ToString(),
+						FilterSettings[n].Description,
+						FilterSettings[n].bIsActive,
+						FilterSettings[n].SettingType,
+						FilterSettings[n].Commands,
+						FilterSettings[n].DefaultValue);
 
-		USettingsBaseButton* tempBtn = CreateWidget<USettingsBaseButton>(GetWorld(), BtnSettingClass.Get());
-		if (tempBtn) {
-			tempBtn->OnBtnHovered.AddDynamic(this, &UMainSettingsWidget::PopulateDescription);
-			if (bFileExist) {
-				tempBtn->SetUpButton(FilterSettings[n].OptionName.ToString(),
-					FilterSettings[n].Description,
-					SavedEntry->bSavedBoolValue,
-					FilterSettings[n].SettingType,
-					FilterSettings[n].Commands,
-					SavedEntry->Value);
-			}
-			else {
-				tempBtn->SetUpButton(FilterSettings[n].OptionName.ToString(),
-					FilterSettings[n].Description,
-					FilterSettings[n].bIsActive,
-					FilterSettings[n].SettingType,
-					FilterSettings[n].Commands,
-					FilterSettings[n].DefaultValue);
 
-
-				//here we should get form the file and modify only the fields user modified
-				//GameSavedSettings is TArray<FSettingEntry> 
+					//here we should get form the file and modify only the fields user modified
+					//GameSavedSettings is TArray<FSettingEntry> 
+				}
 			}
 		}
 	}

@@ -11,10 +11,11 @@
 #include "Interfaces/OnlineSessionInterface.h"
 #include "Interfaces/OnlineIdentityInterface.h"
 #include "steam_api.h"
+#include "USoundManagerData.h"
 class UMainMenuWidget;
-
 // The generated header should always be the last include
 #include "MenuGameInstance.generated.h"
+
 
 /**
  * 
@@ -47,6 +48,8 @@ public:
 	void OnMapLoaded(UWorld* LoadedWorld);
 	void CheckForLobbyMap();
 
+	// Spawning UI 
+	void OpenMainMeu();
 	// Post-login callback handler
 	void OnSteamLoginCompleted(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& UserId, const FString& Error);
 	// Steam player infromation
@@ -92,6 +95,13 @@ public:
 
 	//functions to handle callbacks 
 	void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
+
+	//Sounds in game
+	UPROPERTY(EditAnywhere)
+	UUSoundManagerData* SoundData;
+
+	
+
 private:
 	void CacheSteamUserInfo();
 

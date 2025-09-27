@@ -46,7 +46,7 @@ public:
 	UFUNCTION()
 	void CacheData();
 
-	UFUNCTION(qwq)
+	UFUNCTION()
 	void PopulateDescription(FString Data);
 	UFUNCTION()
 	void FilterSettings(ESettingsCategory Category);

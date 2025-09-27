@@ -38,7 +38,8 @@ void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
         if (GetWorld()->IsGameWorld())
         {
             GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::White, TEXT("We are on lobby game mode post login"));
-
+            PC->SetInputMode(FInputModeUIOnly());
+            PC->bShowMouseCursor = true;
             FTimerHandle TimerHandle;
             GetWorld()->GetTimerManager().SetTimer(
                 TimerHandle,

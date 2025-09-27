@@ -14,6 +14,7 @@
 #include <Kismet/GameplayStatics.h>
 #include "MySavedGame.h"
 #include "SettingsSubsystem.h"
+#include "SoundManager.h"
 
 
 
@@ -28,7 +29,11 @@ void UMenuGameInstance::Init()
        GameSavedSettings = SettingsSubsystem->LoadGameSettings();
     }
     
-
+    USoundManager* SM = GetSubsystem<USoundManager>();
+    if (SM)
+    {
+        SM->SetSoundData(SoundData); 
+    }
     FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UMenuGameInstance::OnMapLoaded);
     OnlineSubsystem = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
     if (OnlineSubsystem)
@@ -70,7 +75,7 @@ void UMenuGameInstance::Init()
     }
 }
 
-void UMenuGameInstance:: (UWorld* LoadedWorld)
+void UMenuGameInstance::OnMapLoaded(UWorld* LoadedWorld)
 {
 }
 
@@ -98,9 +103,15 @@ void UMenuGameInstance::CreateMainMenu()
                     Cast<UMainMenuWidget>( MenuUI)->steamUserAvatar = avatar;
                     Cast<UMainMenuWidget>(MenuUI)->SteamAvatar->SetBrushFromTexture(avatar);
                 }
-                PC->SetInputMode(FInputModeUIOnly());
+                PC->SetInputMode(FInputModeGameAndUI());
                 PC->bShowMouseCursor = true;
-            }        }
+                if (USoundManager* SM = GetSubsystem<USoundManager>())
+                {
+                    SM->PlayMenuMusic();
+                    
+                }
+            }        
+        }
     }
 }
 
@@ -173,6 +184,13 @@ void UMenuGameInstance::CacheSession(FString SessionName, FString SessionPasswor
     ChSessionDetails.MaxPlayers = MaxPlayers;
     ChSessionDetails.JoinInProgress = true;
     ChSessionDetails.ShouldAdvertise = true;
+}
+
+void UMenuGameInstance::OpenMainMeu()
+{
+    UGameplayStatics::OpenLevel(GetWorld(), TEXT("MainMenuLevel"));
+    FTimerHandle MenuDelayHandle;
+    GetWorld()->GetTimerManager().SetTimer(MenuDelayHandle, this, &UMenuGameInstance::CreateMainMenu, 0.5f, false);
 }
 
 void UMenuGameInstance::OnSteamLoginCompleted(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& UserId, const FString& Error)
@@ -310,10 +328,14 @@ void UMenuGameInstance::SaveGame(FString FileName)
 {
     UMySavedGame* SavedGameInstance = Cast<UMySavedGame>(UGameplayStatics::CreateSaveGameObject(UMySavedGame::StaticClass()));
     //All variables to be changed in game
-    SavedGameInstance->MapName = "Temp Name";
-    SavedGameInstance->Progression = 0;
+    SavedGameInstance->MapName = "Begining Town";
+    SavedGameInstance->Progression = 0.1f;
     SavedGameInstance->TimePlayed = 0;// Get local variable for time;
     CreateSession();
+
+    if (FileName.IsEmpty()) {
+        FileName = "BeginingTown";
+    }
     UGameplayStatics::SaveGameToSlot(SavedGameInstance, FileName, 0);
 }
 
@@ -344,6 +366,8 @@ void UMenuGameInstance::OnCreateSessionComplete(FName SessionName, bool bWasSucc
         GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Red, "Session not created");
     }
 }
+
+
 
 void UMenuGameInstance::CacheSteamUserInfo()
 {

@@ -3,13 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/DataTable.h"
 #include "UIEnums.generated.h"
 
+class UTexture2D;
 /**
  * 
  */
-
-
 UENUM(BlueprintType)
 enum class EMenuTypes : uint8
 {

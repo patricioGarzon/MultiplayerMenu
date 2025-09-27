@@ -19,7 +19,7 @@ struct FSettingEntry
     FString Name;
 
     UPROPERTY(BlueprintReadWrite)
-    int Value;
+    int Value =0;
 
     UPROPERTY()
     bool bSavedBoolValue = false;
