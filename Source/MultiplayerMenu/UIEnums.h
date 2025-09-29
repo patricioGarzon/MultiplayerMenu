@@ -39,20 +39,3 @@ enum class EDifficulties : uint8
 	Nightmare			UMETA(DisplayName = "Nightmare")
 };
 
-USTRUCT(BlueprintType)
-struct FLevelData : public FTableRowBase
-{
-	GENERATED_BODY()
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString LevelName;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSoftObjectPtr<UTexture2D> LevelImagePath;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EDifficulties Difficulties = EDifficulties::Easy;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<EDifficulties> CurDifficulty;
-
-};

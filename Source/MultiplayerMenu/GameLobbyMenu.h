@@ -5,7 +5,11 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "UIEnums.h"
+#include "LevelDatabase.h"
+#include <Components/Image.h>
 #include "GameLobbyMenu.generated.h"
+
+
 
 class UCustomButton;
 class ULobbySettingsButton;
@@ -23,14 +27,30 @@ public:
 	UCustomButton* BackButton = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	ULobbySettingsButton* Map = nullptr;
+	ULobbySettingsButton* b_GameSettings = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "UI Data")
+	ULevelDatabase* LevelDatabase;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
-	ULobbySettingsButton* Difficulty = nullptr;
+	UImage* MapPreview = nullptr;
 
 private:
+	UFUNCTION()
 	void BindButtons();
 
 	UFUNCTION()
 	void BackToMainMenu(EMenuTypes MenuType);
+
+	UFUNCTION()
+	void SetUIData();
+
+	UFUNCTION()
+	void MapSelection(EMenuTypes MenuType);
+
+	void SetComboBoxData(const TArray<EDifficulties>& LevelDifficulties);
+
+	void SetMapData(FLevelData Level);
+
 };
+

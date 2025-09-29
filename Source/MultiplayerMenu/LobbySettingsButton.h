@@ -19,8 +19,15 @@ public:
 	virtual void NativeConstruct() override;
 	//For settings in lobby 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
-	TObjectPtr<UTextBlock> LabelText;
+	UTextBlock* LabelText = nullptr;
 
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UTextBlock* MapName = nullptr;
 	UFUNCTION()
 	void UpdateText();
+
+	UPROPERTY(EditAnywhere, Category = "Details")
+	FString LabelName; 
+
+
 };

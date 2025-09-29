@@ -11,4 +11,7 @@ void ULobbySettingsButton::NativeConstruct()
 void ULobbySettingsButton::UpdateText()
 {
 	//Logic for changing the Text
+	if (LabelText) {
+		LabelText->SetText(FText::FromString("Test"));
+	}
 }
