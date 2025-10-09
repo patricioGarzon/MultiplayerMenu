@@ -7,8 +7,12 @@
 #include "UIEnums.h"
 #include "LevelSelectionWidget.generated.h"
 
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLevelSelected, const FLevelData&, SelectedLevel);
+class UTextBlock;
+class UImage;
+class UButton;
+class UUniformGridPanel;
+class ULevelDatabase;
+class UClickableImage;
 
 /**
  * 
@@ -19,8 +23,30 @@ class MULTIPLAYERMENU_API ULevelSelectionWidget : public UUserWidget
 	GENERATED_BODY()
 public:
 
-	void SetUpUI(const TArray<EDifficulties>& LevelDifficulties);
+	void SetUpUI(ULevelDatabase* Data);
+	void PupulateLevels();
 
-	UPROPERTY(BlueprintAssignable, Category = "Events")
-	FOnLevelSelected OnLevelSelected;
+	UFUNCTION()
+	void SetLevelDescription(int index);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UUniformGridPanel* LevelGrid = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UTextBlock* MissionDescription = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	UButton* AcceptButton = nullptr;
+
+	UPROPERTY()
+	ULevelDatabase* gridData;
+
+	UPROPERTY(EditAnywhere, Category = "Details")
+	int DesiredRows = 2;
+
+	UPROPERTY(EditAnywhere, Category = "LevelBtn Class")
+	TSoftClassPtr<UClickableImage> btnClass;
+
+	UPROPERTY()
+	int curIndex = 0;
 };

@@ -12,6 +12,7 @@
 
 
 class UCustomButton;
+class ULevelSelectionWidget;
 class ULobbySettingsButton;
 /**
  * 
@@ -29,6 +30,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	ULobbySettingsButton* b_GameSettings = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	ULevelSelectionWidget* LevelSelection = nullptr;
+
 	UPROPERTY(EditAnywhere, Category = "UI Data")
 	ULevelDatabase* LevelDatabase;
 
@@ -41,16 +45,19 @@ private:
 
 	UFUNCTION()
 	void BackToMainMenu(EMenuTypes MenuType);
-
+	
 	UFUNCTION()
 	void SetUIData();
 
 	UFUNCTION()
-	void MapSelection(EMenuTypes MenuType);
+	void HandleMapSelected();
+
+	UFUNCTION()
+	void DeployMapSelectionWidget(EMenuTypes MenuType);
 
 	void SetComboBoxData(const TArray<EDifficulties>& LevelDifficulties);
 
-	void SetMapData(FLevelData Level);
+	void SetMapData(int Jindex);
 
 };
 

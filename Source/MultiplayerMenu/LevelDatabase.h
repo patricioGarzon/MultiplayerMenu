@@ -16,6 +16,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString LevelName;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString LevelDescription;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSoftObjectPtr<UWorld> LevelPath;
 

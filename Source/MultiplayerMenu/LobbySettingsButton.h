@@ -6,6 +6,7 @@
 #include "CustomButton.h"
 #include "LobbySettingsButton.generated.h"
 
+class UComboBoxString;
 /**
  * 
  */
@@ -20,6 +21,8 @@ public:
 	//For settings in lobby 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UTextBlock* LabelText = nullptr;
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UComboBoxString* Difficulties = nullptr;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UTextBlock* MapName = nullptr;
@@ -28,6 +31,8 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Details")
 	FString LabelName; 
+
+
 
 
 };

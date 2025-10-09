@@ -6,6 +6,7 @@
 #include <OnlineSessionSettings.h>
 #include "MultiplayerMenuGameMode.h"
 #include "NewsFeedManager.h"
+#include "USteamManagerSubsytem.h"
 #include <Kismet/GameplayStatics.h>
 
 
@@ -40,17 +41,14 @@ UNewsFeedManager* UMainMenuWidget::GetNewsFeedManager()
 	return nullptr;
 }
 
-
-
-
 void UMainMenuWidget::PopulateSteamDetails()
 {
 	if (GetWorld()) {
 		if (UGameInstance* GI = GetWorld()->GetGameInstance()) {
 			cachedGameInstance = Cast<UMenuGameInstance>(GI);
-			if (cachedGameInstance) {
-				steamNickname = cachedGameInstance->GetSteamNickname();
-				steamID = cachedGameInstance->GetSteamIdString();
+			if (cachedGameInstance->SteamManager) {
+				steamNickname = cachedGameInstance->SteamManager->GetSteamNickname();
+				steamID = cachedGameInstance->SteamManager->GetSteamIdString();
 				if (SteamNameText) {
 					SteamNameText->SetText(FText::FromString(steamNickname));
 				}
@@ -81,8 +79,8 @@ void UMainMenuWidget::ShowMainMenu(EMenuTypes MenuType)
 
 void UMainMenuWidget::CacheSession(FString SessionName, FString SessionPassword, int MaxPlayers, bool JoinInProgress, bool ShouldAdvertise)
 {
-	cachedGameInstance->CacheSession(SessionName,SessionPassword, MaxPlayers, JoinInProgress,ShouldAdvertise);
-	cachedGameInstance->CreateSession();
+	//cachedGameInstance->CacheSession(SessionName,SessionPassword, MaxPlayers, JoinInProgress,ShouldAdvertise);
+	//cachedGameInstance->CreateSession();
 }
 
 void UMainMenuWidget::OnCreateSessionComplete(FNamedOnlineSession* CreatedSession, bool bWasSuccessful)

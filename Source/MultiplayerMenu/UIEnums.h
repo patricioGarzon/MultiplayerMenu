@@ -36,6 +36,6 @@ enum class EDifficulties : uint8
 	Easy			UMETA(DisplayName = "Easy"),
 	Medium			UMETA(DisplayName = "Medium"),
 	Hard			UMETA(DisplayName = "Hard"),
-	Nightmare			UMETA(DisplayName = "Nightmare")
+	Nightmare		UMETA(DisplayName = "Nightmare")
 };
 

@@ -1,7 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #pragma once
-// Toggle this ON if you're using a backend server for Steam ticket validation
-#define USE_STEAM_AUTH_TICKET false
 
 
 #include "CoreMinimal.h"
@@ -12,11 +10,12 @@
 #include "Interfaces/OnlineIdentityInterface.h"
 #include "steam_api.h"
 #include "USoundManagerData.h"
-class UMainMenuWidget;
+
 // The generated header should always be the last include
 #include "MenuGameInstance.generated.h"
 
-
+class UMainMenuWidget;
+class UUSteamManagerSubsytem;
 /**
  * 
  */
@@ -50,12 +49,6 @@ public:
 
 	// Spawning UI 
 	void OpenMainMeu();
-	// Post-login callback handler
-	void OnSteamLoginCompleted(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& UserId, const FString& Error);
-	// Steam player infromation
-	void PrintSteamInfo();
-	FString GetSteamNickname() const { return CachedNickname; }
-	FString GetSteamIdString() const { return CachedSteamId; }
 
 	UPROPERTY()
 	TArray<FSettingEntry> GameSavedSettings;
@@ -63,7 +56,7 @@ public:
 	// Functions to create and populate main menu data
 	UFUNCTION(BlueprintCallable)
 	void CreateMainMenu();
-	UTexture2D* GetSteamAvatar();
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level UI")
 	TSubclassOf<UMainMenuWidget> MainMenuWidgetClass;
 	UPROPERTY()
@@ -100,18 +93,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	UUSoundManagerData* SoundData;
 
-	
+	UUSteamManagerSubsytem* SteamManager;
 
 private:
-	void CacheSteamUserInfo();
-
-	IOnlineSubsystem* OnlineSubsystem;
-	IOnlineSessionPtr SessionInterface;
-	IOnlineIdentityPtr IdentityInterface;
-
-	
-	FString CachedNickname;
-	FString CachedSteamId;
 
 	float PlaySessionStartTime;
 };
