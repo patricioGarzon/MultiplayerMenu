@@ -73,3 +73,11 @@ void USoundManager::SetSoundData(UUSoundManagerData* Data)
     //set the data asset 
     SoundsDA = Data;
 }
+
+void USoundManager::StopPlayingSound()
+{
+    if (MusicComponent)
+    {
+        MusicComponent->Stop();
+    }
+}

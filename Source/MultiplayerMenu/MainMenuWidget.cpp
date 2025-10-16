@@ -8,6 +8,7 @@
 #include "NewsFeedManager.h"
 #include "USteamManagerSubsytem.h"
 #include <Kismet/GameplayStatics.h>
+#include "SessionManagerSubsystem.h"
 
 
 void UMainMenuWidget::NativeConstruct()
@@ -29,7 +30,7 @@ void UMainMenuWidget::NativeConstruct()
 		SavedGamesArray = cachedGameInstance->LoadSavedGames();
 		PopulateLoadGames();
 	}
-
+	
 }
 
 UNewsFeedManager* UMainMenuWidget::GetNewsFeedManager()
@@ -83,6 +84,15 @@ void UMainMenuWidget::CacheSession(FString SessionName, FString SessionPassword,
 	//cachedGameInstance->CreateSession();
 }
 
+void UMainMenuWidget::CreateGameSession()
+{
+	if (cachedGameInstance)
+	{
+		cachedGameInstance->SessionManager->CreateSession();
+	}
+}
+
+//IT WAS FOR TESTING TO BE REMOVED
 void UMainMenuWidget::OnCreateSessionComplete(FNamedOnlineSession* CreatedSession, bool bWasSuccessful)
 {
 	int32 MaxPlayers = CreatedSession->SessionSettings.NumPublicConnections;
@@ -113,14 +123,19 @@ void UMainMenuWidget::OnMenuClicked(EMenuTypes MenuType)
 		break;
 	case EMenuTypes::JoinSession:
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::White, "Find session BTN");
-		PanelSwitcher->SetActiveWidgetIndex(1);
+		PanelSwitcher->SetActiveWidgetIndex(3);
+
+		if (cachedGameInstance) {
+			cachedGameInstance->SessionManager->FindSessions();
+
+		}
 		break;
 
 	case EMenuTypes::Settings:
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::White, "OpenSettings");
 		PanelSwitcher->SetActiveWidgetIndex(4);
 	case EMenuTypes::Quit:
-		//UKismetSystemLibrary::QuitGame(GetWorld(), GetWorld()->GetFirstPlayerController(), EQuitPreference::Quit, false);
+		UKismetSystemLibrary::QuitGame(GetWorld(), GetWorld()->GetFirstPlayerController(), EQuitPreference::Quit, false);
 		break;
 
 	}

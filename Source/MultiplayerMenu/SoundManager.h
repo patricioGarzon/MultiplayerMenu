@@ -46,6 +46,9 @@ public:
 	UFUNCTION()
 	void SetSoundData(UUSoundManagerData* Data);
 
+	UFUNCTION()
+	void StopPlayingSound();
+
 protected:
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	USoundMix* MasterSoundMix;

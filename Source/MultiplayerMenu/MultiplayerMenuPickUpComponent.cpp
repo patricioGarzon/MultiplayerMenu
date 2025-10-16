@@ -20,7 +20,8 @@ void UMultiplayerMenuPickUpComponent::OnSphereBeginOverlap(UPrimitiveComponent* 
 {
 	// Checking if it is a First Person Character overlapping
 	AMultiplayerMenuCharacter* Character = Cast<AMultiplayerMenuCharacter>(OtherActor);
-	if(Character != nullptr)
+
+	if(Character)
 	{
 		// Notify that the actor is being picked up
 		OnPickUp.Broadcast(Character);

@@ -58,7 +58,7 @@ void UMultiplayerMenuWeaponComponent::Fire()
 	if (FireAnimation != nullptr)
 	{
 		// Get the animation object for the arms mesh
-		UAnimInstance* AnimInstance = Character->GetMesh1P()->GetAnimInstance();
+		UAnimInstance* AnimInstance = Character->GetMesh()->GetAnimInstance();
 		if (AnimInstance != nullptr)
 		{
 			AnimInstance->Montage_Play(FireAnimation, 1.f);
@@ -75,11 +75,21 @@ bool UMultiplayerMenuWeaponComponent::AttachWeapon(AMultiplayerMenuCharacter* Ta
 	{
 		return false;
 	}
-
 	// Attach the weapon to the First Person Character
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-	AttachToComponent(Character->GetMesh1P(), AttachmentRules, FName(TEXT("GripPoint")));
-
+	if (Character->GetMesh()->DoesSocketExist("GripPoint"))
+	{
+		UE_LOG(LogTemp, Log, TEXT("Socket found! Attaching weapon."));
+		AttachToComponent(Character->GetMesh(), AttachmentRules, FName("GripPoint"));
+		//rotate component to forward
+		SetRelativeRotation(FRotator(0.f, 90.f, 0.f)); // example offset tweak
+		Character->weaponEquiped = true;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Socket not found! Attaching to root instead."));
+		AttachToComponent(Character->GetMesh(), AttachmentRules);
+	}
 	// Set up action bindings
 	if (APlayerController* PlayerController = Cast<APlayerController>(Character->GetController()))
 	{

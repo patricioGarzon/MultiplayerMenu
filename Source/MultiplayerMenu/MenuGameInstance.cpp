@@ -1,21 +1,18 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "MenuGameInstance.h"
-#include "OnlineSubsystem.h"
-#include "OnlineSessionSettings.h"
-#include "Interfaces/OnlineSessionInterface.h"
-#include "Interfaces/OnlineIdentityInterface.h"
 #include "MultiplayerMenuGameMode.h"
 #include "GameFramework/Actor.h"
-#include <Private/OnlineSubsystemSteamTypes.h>
-#include "CustromPlayerController.h"
+
 #include "MediaPlayer.h"
 #include "FileMediaSource.h"
 #include <Kismet/GameplayStatics.h>
 #include "MySavedGame.h"
+//SUBSYSTEMS
 #include "SettingsSubsystem.h"
 #include "USteamManagerSubsytem.h"
 #include "SoundManager.h"
+#include "SessionManagerSubsystem.h"
 
 
 
@@ -39,6 +36,7 @@ void UMenuGameInstance::Init()
 
     //get the steam subsytem manager and load it 
     SteamManager = GetSubsystem<UUSteamManagerSubsytem>();
+    SessionManager = GetSubsystem<USessionManagerSubsystem>();
     FTimerHandle MenuDelayHandle;
     GetWorld()->GetTimerManager().SetTimer(MenuDelayHandle, this, &UMenuGameInstance::CreateMainMenu, 1.0f, false);
 }
@@ -134,93 +132,10 @@ void UMenuGameInstance::SaveGame(FString FileName)
     SavedGameInstance->MapName = "Begining Town";
     SavedGameInstance->Progression = 0.1f;
     SavedGameInstance->TimePlayed = 0;// Get local variable for time;
-    CreateSession();
+    //CreateSession();
 
     if (FileName.IsEmpty()) {
         FileName = "BeginingTown";
     }
     UGameplayStatics::SaveGameToSlot(SavedGameInstance, FileName, 0);
-}
-
-// FROM THIS DOWN IS MULTIPLAYER SESSION HANDLING 
-void UMenuGameInstance::CreateSession()
-{
-
-    if (SteamManager->GetSteamOnlineSubs())
-    {
-        IOnlineSessionPtr Sessions = SteamManager->GetSteamOnlineSubs()->GetSessionInterface();
-        if (Sessions.IsValid())
-        {
-
-            // Register the delegate with the session interface
-            OnCreateSessionCompleteDelegateHandle = Sessions->AddOnCreateSessionCompleteDelegate_Handle(
-                FOnCreateSessionCompleteDelegate::CreateUObject(this, &UMenuGameInstance::OnCreateSessionComplete)
-            );
-            //
-            FOnlineSessionSettings SessionSettings;
-            SessionSettings.NumPublicConnections = ChSessionDetails.MaxPlayers; // Set max players
-            SessionSettings.bAllowJoinInProgress = ChSessionDetails.JoinInProgress;
-            SessionSettings.bShouldAdvertise = ChSessionDetails.ShouldAdvertise;
-            SessionSettings.bUsesPresence = true;
-            SessionSettings.bUseLobbiesIfAvailable = true;
-
-            if (!ChSessionDetails.SessionPassword.IsEmpty()) {
-                SessionSettings.Set(FName(ChSessionDetails.SessionPassword), FString(ChSessionDetails.SessionPassword), EOnlineDataAdvertisementType::ViaOnlineService);
-            }
-            CSteamID SteamID = SteamUser()->GetSteamID();
-            IOnlineIdentityPtr Identity = SteamManager->GetSteamOnlineSubs()->GetIdentityInterface();
-            if (Identity.IsValid())
-            {
-                TSharedPtr<const FUniqueNetId> UniqueId = Identity->GetUniquePlayerId(0);
-                if (UniqueId.IsValid())
-                {
-                    // ✅ Now pass a reference to CreateSession
-                    bool bCreated = Sessions->CreateSession(*UniqueId, FName(*ChSessionDetails.SessionName), SessionSettings);
-                    if (!bCreated)
-                    {
-                        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("CreateSession failed to start"));
-                    }
-                    else {
-                        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Session Created"));
-                    }
-                }
-                else
-                {
-                    GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::White, "Unique ID not created");
-                }
-            }
-        }
-    }
-    else {
-        //Prepare to create local, offline game
-        UGameplayStatics::OpenLevel(this, "LobbyMenuLevel");
-    }
-}
-
-void UMenuGameInstance::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)
-{
-    if (bWasSuccessful) {
-        if (SteamManager->GetSteamOnlineSubs())
-        {
-            IOnlineSessionPtr Sessions = SteamManager->GetSteamOnlineSubs()->GetSessionInterface();
-            if (Sessions.IsValid())
-            {
-                if (GetWorld() && GetWorld()->GetNetMode() != NM_Client)
-                {
-                    // Host = local controller on listen server
-                    APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-                    if (ACustromPlayerController* HostPC = Cast<ACustromPlayerController>(PC))
-                    {
-                        GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::White, "Player calling server travel");
-                        HostPC->Server_TravelToLobby();
-                    }
-                    // Perform ServerTravel with seamless travel disabled
-                    //GetWorld()->ServerTravel("/Game/Menu/LobbyMenuLevel?listen", false); // false disables seamless travel
-                }
-            }
-        }
-    }
-    else {
-        GEngine->AddOnScreenDebugMessage(-1, 30.0f, FColor::Red, "Session not created");
-    }
 }

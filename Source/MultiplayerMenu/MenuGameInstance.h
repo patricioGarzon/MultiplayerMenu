@@ -3,9 +3,8 @@
 
 
 #include "CoreMinimal.h"
-// For multiplayer 
-#include "OnlineSubsystem.h"
-#include "OnlineSubsystemSteam.h"
+
+
 #include "Interfaces/OnlineSessionInterface.h"
 #include "Interfaces/OnlineIdentityInterface.h"
 #include "steam_api.h"
@@ -16,24 +15,11 @@
 
 class UMainMenuWidget;
 class UUSteamManagerSubsytem;
+class USessionManagerSubsystem;
 /**
  * 
  */
-USTRUCT(BlueprintType)
-struct FSessionDetails
-{
-	GENERATED_BODY()
-	UPROPERTY(BlueprintReadWrite)
-	FString SessionName;
-	UPROPERTY(BlueprintReadWrite)
-	FString SessionPassword;
-	UPROPERTY(BlueprintReadWrite)
-	int MaxPlayers =0;
-	UPROPERTY(BlueprintReadWrite)
-	bool JoinInProgress = false;
-	UPROPERTY(BlueprintReadWrite)
-	bool ShouldAdvertise = false;
-};
+
 
 struct FSettingEntry;
 
@@ -62,14 +48,6 @@ public:
 	UPROPERTY()
 	UMainMenuWidget* MenuUI = nullptr;
 
-	// Connectivity hosting and finding game;
-	UPROPERTY(BlueprintReadWrite)
-	FSessionDetails ChSessionDetails;
-	void CacheSession(FString SessionName, FString SessionPassword, int MaxPlayers, bool JoinInProgress, bool ShouldAdvertise);
-	void CreateSession();
-	void FindSessions();
-	void JoinSession();
-
 
 	// Loading and saving games
 	UFUNCTION(BlueprintCallable)
@@ -81,19 +59,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SaveGame(FString FileName);
 
-			// Sessions Call backs 
-	// Delegate to handle session creation completion
-	FOnCreateSessionCompleteDelegate OnCreateSessionCompleteDelegate;
-	FDelegateHandle OnCreateSessionCompleteDelegateHandle;
-
-	//functions to handle callbacks 
-	void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
-
 	//Sounds in game
 	UPROPERTY(EditAnywhere)
 	UUSoundManagerData* SoundData;
 
-	UUSteamManagerSubsytem* SteamManager;
+	//STEAM SUBSYSTEMS
+	UUSteamManagerSubsytem* SteamManager = nullptr;
+	USessionManagerSubsystem* SessionManager = nullptr;
 
 private:
 

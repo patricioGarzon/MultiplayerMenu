@@ -16,6 +16,7 @@ class UMediaPlayer;
 class UFileMediaSource;
 class UNewsFeedManager;
 struct FNewsItem;
+class UMenuGameInstance;
 
 #include "MainMenuWidget.generated.h"
 
@@ -35,6 +36,7 @@ private:
 public:
 	virtual void NativeConstruct() override;
 
+
 	//FUNTCIONTS -- Steam Related 
 	void SetSteamAvatar();
 	void PopulateSteamDetails();
@@ -44,9 +46,12 @@ public:
 	void ShowMainMenu(EMenuTypes MenuType);
 	UFUNCTION()
 	void CacheSession(FString SessionName, FString SessionPassword, int MaxPlayers, bool JoinInProgress, bool ShouldAdvertise);
-	
+	UFUNCTION(BlueprintCallable)
+	void CreateGameSession();
 
 	void OnCreateSessionComplete(FNamedOnlineSession* SessionName, bool bWasSuccessful);
+
+
 
 	//FUNTCIONTS --News Feed
 	UNewsFeedManager* GetNewsFeedManager();
@@ -63,7 +68,6 @@ public:
 	UFUNCTION()
 	void BindUI();
 	
-
 	// PROPERTIES -- Instances
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UMenuGameInstance* cachedGameInstance;

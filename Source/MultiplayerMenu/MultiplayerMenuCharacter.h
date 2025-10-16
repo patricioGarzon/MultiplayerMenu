@@ -49,9 +49,12 @@ class AMultiplayerMenuCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
 	
+
 public:
 	AMultiplayerMenuCharacter();
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	bool weaponEquiped = false;
 protected:
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
