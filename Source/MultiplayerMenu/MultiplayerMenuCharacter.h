@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "UIEnums.h"
 #include "MultiplayerMenuCharacter.generated.h"
 
 class UInputComponent;
@@ -13,6 +14,7 @@ class UCameraComponent;
 class UInputAction;
 class UInputMappingContext;
 class USpringArmComponent;
+class UMultiplayerMenuWeaponComponent;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -48,7 +50,6 @@ class AMultiplayerMenuCharacter : public ACharacter
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
-	
 
 public:
 	AMultiplayerMenuCharacter();
@@ -61,6 +62,20 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
+
+	//Weapon Management
+	void EquipWeaponBySlot(EWeaponSlot Slot);
+
+	void EquipWeapon(UMultiplayerMenuWeaponComponent* WeaponToEquip);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapons")
+	UMultiplayerMenuWeaponComponent* PrimaryWeapon;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapons")
+	UMultiplayerMenuWeaponComponent* SecondaryWeapon;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapons")
+	UMultiplayerMenuWeaponComponent* ThrowableWeapon;
 
 protected:
 	// APawn interface

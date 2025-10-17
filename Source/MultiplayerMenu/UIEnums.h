@@ -39,3 +39,11 @@ enum class EDifficulties : uint8
 	Nightmare		UMETA(DisplayName = "Nightmare")
 };
 
+UENUM(BlueprintType)
+enum class EWeaponSlot : uint8
+{
+	Primary			UMETA(DisplayName = "Primary"),
+	Secondary		UMETA(DisplayName = "Secondary"),
+	Throwable		UMETA(DisplayName = "Throwable"),
+	Healing			UMETA(DisplayName = "Healing"),
+};

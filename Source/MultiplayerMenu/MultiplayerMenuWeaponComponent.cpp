@@ -77,11 +77,10 @@ bool UMultiplayerMenuWeaponComponent::AttachWeapon(AMultiplayerMenuCharacter* Ta
 	}
 	// Attach the weapon to the First Person Character
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-	if (Character->GetMesh()->DoesSocketExist("GripPoint"))
+	if (Character->GetMesh()->DoesSocketExist("WeaponSocket"))
 	{
-		UE_LOG(LogTemp, Log, TEXT("Socket found! Attaching weapon."));
-		AttachToComponent(Character->GetMesh(), AttachmentRules, FName("GripPoint"));
-		//rotate component to forward
+		//UE_LOG(LogTemp, Log, TEXT("Socket found! Attaching weapon."));
+		AttachToComponent(Character->GetMesh(), AttachmentRules, FName("WeaponSocket"));
 		SetRelativeRotation(FRotator(0.f, 90.f, 0.f)); // example offset tweak
 		Character->weaponEquiped = true;
 	}

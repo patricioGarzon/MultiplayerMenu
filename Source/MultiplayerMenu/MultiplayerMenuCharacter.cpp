@@ -10,6 +10,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "MultiplayerMenuWeaponComponent.h"
 #include "Engine/LocalPlayer.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -23,7 +24,7 @@ AMultiplayerMenuCharacter::AMultiplayerMenuCharacter()
 
 	// Create the camera boom (spring arm)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(RootComponent);
+	CameraBoom->SetupAttachment(GetMesh());
 	CameraBoom->TargetArmLength = 300.0f;             // Distance to the character
 	CameraBoom->bUsePawnControlRotation = true;       // Rotate the arm based on the controller
 
@@ -95,5 +96,38 @@ void AMultiplayerMenuCharacter::Look(const FInputActionValue& Value)
 		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
+		//rotate the mesh
+		float Pitch = FMath::ClampAngle(LookAxisVector.Y, -90.0f, 90.0f);
+
 	}
+}
+
+void AMultiplayerMenuCharacter::EquipWeaponBySlot(EWeaponSlot Slot)
+{
+	UMultiplayerMenuWeaponComponent* Temp = nullptr;
+	switch (Slot)
+	{
+	case EWeaponSlot::Primary:
+		Temp = PrimaryWeapon;
+		break;
+	case EWeaponSlot::Secondary:
+		Temp = SecondaryWeapon;
+		break;
+	case EWeaponSlot::Throwable:
+		Temp = ThrowableWeapon;
+		break;
+	}
+	if (Temp)
+	{
+		EquipWeapon(Temp);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No weapon assigned for this slot!"));
+	}
+}
+
+void AMultiplayerMenuCharacter::EquipWeapon(UMultiplayerMenuWeaponComponent* WeaponToEquip)
+{
+
 }
